@@ -28,10 +28,41 @@ const generateInverterStatus = () => {
 
 const generateBatteryLevel = () => Math.max(20, Math.min(100, Math.floor(Math.random() * 30) + 70));
 const generateEnergyConsumption = () => Math.floor(Math.random() * 500) + 100;
-const generateSensorData = () => ({
-  temperature: Math.floor(Math.random() * 10) + 28,
-  humidity: Math.floor(Math.random() * 20) + 60
-});
+const generateSensorData = async () => {
+  const latitude = 25.2500;  // Bhagalpur coordinates
+  const longitude = 87.0169;
+
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=relativehumidity_2m`;
+    const response = await fetch(url);
+    const data = await response.json();
+    if (
+      data &&
+      data.current_weather &&
+      typeof data.current_weather.temperature === "number"
+    ) {
+      const temperature = data.current_weather.temperature;
+      const humidity =
+        data.hourly?.relativehumidity_2m?.[0] ??
+        Math.floor(Math.random() * 20) + 60; // fallback if humidity missing
+      return { temperature, humidity };
+    } else {
+      // Invalid data → fallback
+      return {
+        temperature: Math.floor(Math.random() * 10) + 28,
+        humidity: Math.floor(Math.random() * 20) + 60,
+      };
+    }
+  } catch (error) {
+    console.error("API error:", error);
+    // API failed → fallback
+    return {
+      temperature: Math.floor(Math.random() * 10) + 28,
+      humidity: Math.floor(Math.random() * 20) + 60,
+    };
+  }
+};
+
 
 const initializeClientData = (socketId) => {
   connectedClients.set(socketId, {
@@ -95,10 +126,10 @@ io.on('connection', (socket) => {
     }
   }, 5000);
 
-  intervals.sensor = setInterval(() => {
+  intervals.sensor = setInterval(async() => {
     const clientData = connectedClients.get(socket.id);
     if (clientData) {
-      const sensorData = generateSensorData();
+      const sensorData = await generateSensorData();
       clientData.temperature = sensorData.temperature;
       clientData.humidity = sensorData.humidity;
       socket.emit('sensorData', sensorData);

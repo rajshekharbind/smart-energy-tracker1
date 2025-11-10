@@ -82,7 +82,6 @@ const StatusCard = ({ title, value, subtitle, icon, color, onClick }) => {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       className={`rounded-xl p-6 text-white shadow-lg cursor-pointer transition-all duration-300 ${color} status-card`}
-      className={`rounded-xl p-4 sm:p-6 text-white shadow-lg cursor-pointer transition-all duration-300 interactive ${color}`}
       onClick={onClick}
       role="button"
       tabIndex={0}
