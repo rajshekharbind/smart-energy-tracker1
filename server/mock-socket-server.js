@@ -5,9 +5,11 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import cookieParser from "cookie-parser";
 
 const app = express();
 app.use(cors());
+app.use(cookieParser());
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -255,13 +257,30 @@ app.get('/info', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
+dotenv.config();
+
+
+// connectDB().then(
+//   server.listen(PORT, () => {
+//     console.log(`🚀 InvertorGuard Mock Socket.IO server running on port ${PORT}`);
+//     console.log(`📍 Health check: http://localhost:${PORT}/health`);
+//     console.log(`📍 Server info: http://localhost:${PORT}/info`);
+//     console.log(`🔌 Connect your React app to: http://localhost:${PORT}`);
+//     console.log(`👥 Ready for client connections...`);
+//   })
+// ).catch((err)=>
+// {
+//   console.log('database connection faield',err);
+// });
+
+
 server.listen(PORT, () => {
   console.log(`🚀 InvertorGuard Mock Socket.IO server running on port ${PORT}`);
   console.log(`📍 Health check: http://localhost:${PORT}/health`);
   console.log(`📍 Server info: http://localhost:${PORT}/info`);
   console.log(`🔌 Connect your React app to: http://localhost:${PORT}`);
   console.log(`👥 Ready for client connections...`);
-});
+})
 
 // Graceful shutdown
 process.on('SIGINT', () => {
