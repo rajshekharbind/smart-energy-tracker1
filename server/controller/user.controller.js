@@ -36,6 +36,7 @@ export const registerUser = asyncHandler(async (req, res) => {
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
+
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -57,10 +58,11 @@ export const loginUser = asyncHandler(async (req, res) => {
   // Set token in HTTP-only cookie
   res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: false,  // ❗ localhost uses HTTP, not HTTPS
+    sameSite: "lax",
     maxAge: 24 * 60 * 60 * 1000,
   });
+
 
   return res.status(200).json({
     success: true,
@@ -78,8 +80,8 @@ export const loginUser = asyncHandler(async (req, res) => {
 export const logoutUser = asyncHandler(async (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: false,
+    sameSite: "lax",
   });
 
   return res.status(200).json({

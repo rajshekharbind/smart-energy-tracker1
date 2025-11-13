@@ -6,10 +6,21 @@ import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import cookieParser from "cookie-parser";
+import userrouter from "./routes/user.route.js"
+import dotenv from "dotenv";
+import connectDB from "./utils/connect-db.js"
+
+dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:5173"], // 👈 your React app
+  credentials: true,                 // 👈 allow cookies
+}));
+app.use(express.json());
 app.use(cookieParser());
+app.use("/api",userrouter)
+
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -257,30 +268,30 @@ app.get('/info', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3001;
-dotenv.config();
 
 
-// connectDB().then(
-//   server.listen(PORT, () => {
-//     console.log(`🚀 InvertorGuard Mock Socket.IO server running on port ${PORT}`);
-//     console.log(`📍 Health check: http://localhost:${PORT}/health`);
-//     console.log(`📍 Server info: http://localhost:${PORT}/info`);
-//     console.log(`🔌 Connect your React app to: http://localhost:${PORT}`);
-//     console.log(`👥 Ready for client connections...`);
-//   })
-// ).catch((err)=>
-// {
-//   console.log('database connection faield',err);
-// });
+connectDB()
+  .then(() => {
+    server.listen(PORT, () => {
+      console.log(`🚀 InvertorGuard Mock Socket.IO server running on port ${PORT}`);
+      console.log(`📍 Health check: http://localhost:${PORT}/health`);
+      console.log(`📍 Server info: http://localhost:${PORT}/info`);
+      console.log(`🔌 Connect your React app to: http://localhost:${PORT}`);
+      console.log(`👥 Ready for client connections...`);
+    })
+  })
+  .catch((err) => {
+    console.error("❌ Database connection failed:", err);
+  });
 
 
-server.listen(PORT, () => {
-  console.log(`🚀 InvertorGuard Mock Socket.IO server running on port ${PORT}`);
-  console.log(`📍 Health check: http://localhost:${PORT}/health`);
-  console.log(`📍 Server info: http://localhost:${PORT}/info`);
-  console.log(`🔌 Connect your React app to: http://localhost:${PORT}`);
-  console.log(`👥 Ready for client connections...`);
-})
+// server.listen(PORT, () => {
+//   console.log(`🚀 InvertorGuard Mock Socket.IO server running on port ${PORT}`);
+//   console.log(`📍 Health check: http://localhost:${PORT}/health`);
+//   console.log(`📍 Server info: http://localhost:${PORT}/info`);
+//   console.log(`🔌 Connect your React app to: http://localhost:${PORT}`);
+//   console.log(`👥 Ready for client connections...`);
+// })
 
 // Graceful shutdown
 process.on('SIGINT', () => {

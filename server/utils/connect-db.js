@@ -1,22 +1,22 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
 
-const connectDB=async ()=>{
-    try {
-
-        if(!process.env.MONGO_URI){
-            console.warn('MONGO_URI not found in .env - database features will be unavailable');
-            return;
-        }
-
-        await mongoose.connect(`${process.env.MONGO_URI}`)
-
-        console.log(`\n mongodb connected`);
-
-    } catch (error) {
-
-        console.warn("Mongodb connection error - database features will be unavailable:",error.message);
-        
+const connectDB = async () => {
+  try {
+    
+    if (!process.env.MONGO_URI) {
+      throw new Error("❌ Missing MONGO_URI in .env file!");
     }
-}
+
+    await mongoose.connect(process.env.MONGO_URI);
+
+    console.log(`✅ MongoDB connected successfully`);
+  } catch (error) {
+    console.error("❌ MongoDB connection error:", error.message);
+
+    throw error;
+  }
+};
 
 export default connectDB;
